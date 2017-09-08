@@ -10,35 +10,10 @@ function activate(context) {
     // This line of code will only be executed once when your extension is activated
     console.log('Congratulations, your extension "test" is now active!');
 
-    // var terminal = new Terminal();
-    // console.log(terminal);
-    // console.log('terminal');
-    
-     
-    
-        // let run = vscode.commands.registerCommand('terminal.run', () => {
-        //     terminal.run();
-        // });
-    
-        // let stop = vscode.commands.registerCommand('terminal.stop', () => {
-        //     terminal.stop();
-        // });
-    
-        // let open = vscode.commands.registerCommand('terminal.open', (fileUri) => {
-        //     terminal.open(fileUri);
-        // });
-    
-        // let toggle = vscode.commands.registerCommand('terminal.toggle', () => {
-        //     terminal.toggle();
-        // });
-    // The command has been defined in the package.json file
     // Now provide the implementation of the command with  registerCommand
     // The commandId parameter must match the command field in package.json
     var disposable = vscode.commands.registerCommand('extension.sayHello', function () {
-        // vscode.commands.registerCommand('terminal.run', () => {
-        //     console.log('run');
-        //     terminal.run();
-        // });
+
         vscode.workspace.onDidChangeTextDocument(handleChange);
         vscode.window.onDidChangeTextEditorSelection(onSelection);
         vscode.debug.onDidChangeActiveDebugSession(changeDeb);
@@ -49,10 +24,6 @@ function activate(context) {
         
         vscode.debug.onDidTerminateDebugSession(endDeb);
     })
-    
-    // vscode.commands.registerCommand('extension.debugggg', function () {
-    //     console.log('here d');
-    // })
      console.log(vscode.debug.activeDebugSession);
     
 }
@@ -81,12 +52,10 @@ function endDeb(event) {
 }
 
 function handleChange(event) {
-    // console.log("Change in the text editor");
     var selection = event.contentChanges[0];
     var letter = selection.text;
     var line = selection.range.start.line;
     console.log("New key press: key: " + letter + " line: " + line + " character: " + selection.range.start.character );
-    // console.log(event);
 }
 
 function onSelection(event){
@@ -101,7 +70,6 @@ function onSelection(event){
             console.log('Click:  line: ' + select.start.line + '  character: ' + select.start.character );                    
         }
     }
-    //console.log(event);
 }
 
 // this method is called when your extension is deactivated
