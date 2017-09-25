@@ -1,0 +1,12 @@
+{
+  "name": "GrowthMindsetIntroCSIDE",
+  "version": "0.0.1",
+  "description": "prototype for testing chance",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/NUDelta/GrowthMindsetIntroCSIDE.git"
+  },
+  "devDependencies": {
+    "codemirror": "^5.13.4"
+  }
+}
