@@ -10,9 +10,17 @@
 	<script src="node_modules/codemirror/lib/codemirror.js"></script>
 	<link rel="stylesheet" href="node_modules/codemirror/lib/codemirror.css">
 	<script src="node_modules/codemirror/mode/python/python.js"></script>
+	<script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script> 
+<script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script>
 </head>
 <body>
         <div class="editorArea" id="editorArea"></div>
+        <textarea id="code" name="code">print 'hello World'</textarea>
+        <textarea id="output" name="output">out</textarea>
+        <div id="runButton">Run</div>
+
+        <!-- <div id="output">Out</div> -->
+
 </body>
 <script src="main.js"></script> 
 
