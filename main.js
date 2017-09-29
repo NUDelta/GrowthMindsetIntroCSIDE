@@ -11,10 +11,9 @@ $(document).ready(function(e) {
   myCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode:  "python",
     theme: 'monokai',
-    extraKeys: {
-      //"Enter": onNewLine
-    },
-    indentWithTabs: true
+    indentWithTabs: true,
+    indentUnit: 4,
+    lineNumbers: true,
   });
 
   var charCount = myCodeMirror.getValue().length;
@@ -33,12 +32,6 @@ $('#runButton').on('click', function(e) {
   myCodeMirror.on("mousedown", function () {
     mousedown = true;
   });
-  myCodeMirror.on('onKeyDown', function(e){
-    console.log('key');
-    console.log(e);
-    lastKeyPressed = e.which;
-  });
-
 });
 
 
@@ -171,9 +164,3 @@ function getErrLineNum(err) {
   var lineNum = err.traceback[0].lineno;
   return lineNum
 }
-
-// function onNewLine(e){
-//   console.log(e);
-//   myCodeMirror.replaceSelection("\n" ,"end");
-//   lastKeyPressed = 'enter';
-// }
