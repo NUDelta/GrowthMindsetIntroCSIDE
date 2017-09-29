@@ -3,18 +3,26 @@ var lastCompilation;
 var lineError = '';
 var myCodeMirror;
 var charCount;
+var lastKeyPressed;
+
+
 $(document).ready(function(e) {
   //set up screen
   myCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
-  mode:  "python",
-  theme: 'monokai',
+    mode:  "python",
+    theme: 'monokai',
+    extraKeys: {
+      //"Enter": onNewLine
+    },
+    indentWithTabs: true
   });
 
   var charCount = myCodeMirror.getValue().length;
   //Run Button listener
-  $('#runButton').onclick = function(e) {
+$('#runButton').on('click', function(e) {
    runit(myCodeMirror);
-  }
+  });
+
   // CodeMirror Listeners
   myCodeMirror.on('change',function(cMirror, change){
     editorChange(change);
@@ -25,6 +33,12 @@ $(document).ready(function(e) {
   myCodeMirror.on("mousedown", function () {
     mousedown = true;
   });
+  myCodeMirror.on('onKeyDown', function(e){
+    console.log('key');
+    console.log(e);
+    lastKeyPressed = e.which;
+  });
+
 });
 
 
@@ -60,24 +74,23 @@ function builtinRead(x) {
 */
 var lastSetTimeout;
 function runit(myCodeMirror) {
+  //get time between compilations
    var d = new Date(); 
    d.getTime();
-   //how to get time between compilations
-   //console.log(d- lastCompilation);
+   var compileDelta = d - lastCompilation;
    lastCompilation = d;
+
+   //run python code using skuplt
    var prog = myCodeMirror.getValue(); 
    var mypre = document.getElementById("output"); 
-
    Sk.pre = "output";
-   // this should realy be after promise is fullfilled, but i'm not sure how to do that when i want it to go after all the outputs
-   mypre.innerHTML = mypre.innerHTML +  "\n>"; 
-
    Sk.configure({output:outf, read:builtinRead}); 
    var myPromise = Sk.misceval.asyncToPromise(function() {
        return Sk.importMainWithBody("<stdin>", false, prog, true);
    });
    myPromise.then(function(mod) {
        console.log('success');
+       mypre.innerHTML = mypre.innerHTML +  "\n>"; 
        $('#output').scrollTop($('#output')[0].scrollHeight);
    },
    function(err) {
@@ -86,34 +99,56 @@ function runit(myCodeMirror) {
        clearTimeout(lastSetTimeout);
        lineError = getErrLineNum(err);
        lastSetTimeout = setTimeout(function(){ 
-        lineError = '';
-        console.log('reset LineNum') 
+         lineError = '';
     }, 30000)
+       mypre.innerHTML = mypre.innerHTML +  "\n>"; 
        $('#output').scrollTop($('#output')[0].scrollHeight);
    });
      
 } 
 
 function editorChange(changeObj) {
-  if (changeObj.from.line == changeObj.to.line && changeObj.from.ch == changeObj.to.ch){
-    console.log('same');
+  // keeping track of the last key that was pressed
+  lastKeyPressed = changeObj.text[0];
+  //detecting eerrors
+  if (changeObj.text.length == 2 && !changeObj.text[0] && !changeObj.text[1] ){
+    lastKeyPressed = 'enter';
   }
+  if (changeObj.from.line == changeObj.to.line && changeObj.from.ch == changeObj.to.ch){
+    // added one character
+  }
+  
+  //character count of editor
   newCharCount = myCodeMirror.getValue().length;
-  if (newCharCount-charCount>2){
-    console.log('METRIC: paste')
+  if (newCharCount-charCount > 2 && lastKeyPressed !='enter'){
+    console.log('METRIC: paste');
   }
   charCount = newCharCount;
-  console.log(lineError);
+
+  //Evaluating Metric: editErrLineNum
   if (lineError){
-    if (Math.abs(changeObj.to.line - lineError) <3){
-      lineError=''
-      console.log("METRIC edit Line num")
+    if (Math.abs(changeObj.to.line - lineError) < 5){
+      lineError='';
+      console.log("METRIC editErrLineNum_edit");
+    }
+    //if they edit somewhere else first, that doesn't count
+    else {
+      lineError = '';
     }
   }
 }
 
 function cursorChange(cMirror) {
    sel = myCodeMirror.getSelection(); //literally a string of what is selected
+
+   //Evaluating Metric: editErrLineNum
+    if (lineError){
+      if (Math.abs(myCodeMirror.getCursor().line - lineError) < 5){
+        lineError='';
+        console.log("METRIC editErrLineNum_cursor");
+      }
+    }
+
     if (sel){
       //console.log('selection');
     }
@@ -128,10 +163,6 @@ function cursorChange(cMirror) {
     mousedown = false;
 }
 
-document.onkeypress = function (event) {
-  // console.log(event);
-}
-
 /*  getErrLineNum
     inputs: msg - string of error message
     output: number of line error occured on
@@ -140,3 +171,9 @@ function getErrLineNum(err) {
   var lineNum = err.traceback[0].lineno;
   return lineNum
 }
+
+// function onNewLine(e){
+//   console.log(e);
+//   myCodeMirror.replaceSelection("\n" ,"end");
+//   lastKeyPressed = 'enter';
+// }
