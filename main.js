@@ -5,6 +5,11 @@ var myCodeMirror;
 var charCount;
 var lastKeyPressed;
 
+// When the user clicks on <div>, open the popup
+function popup() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+}
 
 $(document).ready(function(e) {
   //set up screen
