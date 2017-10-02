@@ -1,10 +1,16 @@
-var mousedown = false;
-var lastCompilation;
-var lineError = '';
 var myCodeMirror;
+
+var mousedown = false;
 var charCount;
 var lastKeyPressed;
+
+var lastComiplationTime;
+var errorLineNum;
+var editErrLineNumMetric;
+var errorCycleCount = 0;
 var lastCompileSuccessful;
+
+var lastCompiledCode;
 
 
 $(document).ready(function(e) {
@@ -105,14 +111,26 @@ function builtinRead(x) {
 */
 var lastSetTimeout;
 function runit(myCodeMirror) {
+  console.log(window.history);
   //get time between compilations
     var d = new Date(); 
     d.getTime();
-    var compileDelta = d - lastCompilation;
-    lastCompilation = d;
+    // Time between current compile and previous compile
+    var compileDelta = d - lastComiplationTime;
+    lastComiplationTime = d;
 
     //run python code using skuplt
-    var prog = myCodeMirror.getValue(); 
+    var prog = myCodeMirror.getValue();
+
+    //Check to see if user made any changes between compiles 
+    // makes sure last compile was more than 1 second before to make sure it wasn't double click
+    if (prog == lastCompiledCode && compileDelta > 1000 ){
+      console.log('ANTI-metric: No change between compiles');
+      // if user fails to make changes, then they aren't being persisitant in error Cycle
+      errorCycleCount = 0;
+    }
+    lastCompiledCode = prog;
+
     var mypre = document.getElementById("output"); 
     Sk.pre = "output";
     Sk.configure({output:outf, read:builtinRead}); 
@@ -122,21 +140,44 @@ function runit(myCodeMirror) {
     checkForPrint(prog);
     myPromise.then(function(mod) {
        console.log('success');
+
+       //evaluate if broken error cycle
+       if (errorCycleCount > 5) {
+        console.log("METRIC: breakOutOfErrCycle");
+       }
+       errCycleCount = 0;
+
        mypre.innerHTML = mypre.innerHTML +  "\n>"; 
        $('#output').scrollTop($('#output')[0].scrollHeight);
        lastCompileSuccessful = true;
     },
     function(err) {
-       outf(err.toString());
-       console.log(err);
-       clearTimeout(lastSetTimeout);
-       lineError = getErrLineNum(err);
-       lastSetTimeout = setTimeout(function(){ 
-         lineError = '';
-    }, 30000)
-       mypre.innerHTML = mypre.innerHTML +  "\n>"; 
-       $('#output').scrollTop($('#output')[0].scrollHeight);
-       lastCompileSuccessful = false;
+      outf(err.toString());
+      console.log(err);
+      clearTimeout(lastSetTimeout);
+      currentErrLineNum = getErrLineNum(err);
+      // check to see if still in errorCycle
+      if (!lastCompileSuccessful) {
+        if (Math.abs((errorLineNum -currentErrLineNum))<5){
+          errorCycleCount += 1;
+        }
+        else {
+          if (currentErrLineNum > errorLineNum && errorCycleCount > 5) {
+            console.log("METRIC: breakOutOfErrCycle");
+          }
+          errorCycleCount = 0;
+        }
+      }
+      errorLineNum = currentErrLineNum;
+      editErrLineNumMetric = true;
+
+      // set timer to reset metric for err line number edit
+      lastSetTimeout = setTimeout(function(){ 
+        editErrLineNumMetric = false;
+      }, 30000)
+      mypre.innerHTML = mypre.innerHTML +  "\n>"; 
+      $('#output').scrollTop($('#output')[0].scrollHeight);
+      lastCompileSuccessful = false;
     });
 } 
 
@@ -159,15 +200,12 @@ function editorChange(changeObj) {
   charCount = newCharCount;
 
   //Evaluating Metric: editErrLineNum
-  if (lineError){
-    if (Math.abs(changeObj.to.line - lineError) < 5){
-      lineError='';
+  if (errorLineNum){
+    if (Math.abs(changeObj.to.line - errorLineNum) < 5){
       console.log("METRIC editErrLineNum_edit");
     }
     //if they edit somewhere else first, that doesn't count
-    else {
-      lineError = '';
-    }
+    editErrLineNumMetric = false;
   }
 }
 
@@ -175,9 +213,9 @@ function cursorChange(cMirror) {
    sel = myCodeMirror.getSelection(); //literally a string of what is selected
 
    //Evaluating Metric: editErrLineNum
-    if (lineError){
-      if (Math.abs(myCodeMirror.getCursor().line - lineError) < 5){
-        lineError='';
+    if (errorLineNum){
+      if (Math.abs(myCodeMirror.getCursor().line - errorLineNum) < 5){
+        editErrLineNumMetric = false;
         console.log("METRIC editErrLineNum_cursor");
       }
     }
