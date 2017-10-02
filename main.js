@@ -7,6 +7,7 @@ var lastKeyPressed;
 
 
 $(document).ready(function(e) {
+
   //set up screen
   myCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode:  "python",
@@ -17,7 +18,9 @@ $(document).ready(function(e) {
     indentWithTabs: true
   });
 
+
   var charCount = myCodeMirror.getValue().length;
+
   //Run Button listener
 $('#runButton').on('click', function(e) {
    runit(myCodeMirror);
@@ -171,6 +174,17 @@ function getErrLineNum(err) {
   var lineNum = err.traceback[0].lineno;
   return lineNum
 }
+
+document.getElementById("simbutton").onclick = function(){
+    
+    console.log("in here");
+    document.getElementById("output").innerHTML += "great process: You are growing your skills! \n";
+
+};
+
+
+
+
 
 // function onNewLine(e){
 //   console.log(e);
