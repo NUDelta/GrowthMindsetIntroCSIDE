@@ -4,6 +4,7 @@ var lineError = '';
 var myCodeMirror;
 var charCount;
 var lastKeyPressed;
+var lastCompileSuccessful;
 
 
 $(document).ready(function(e) {
@@ -11,10 +12,9 @@ $(document).ready(function(e) {
   myCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode:  "python",
     theme: 'monokai',
-    extraKeys: {
-      //"Enter": onNewLine
-    },
-    indentWithTabs: true
+    indentWithTabs: true,
+    indentUnit: 4,
+    lineNumbers: true,
   });
 
   var charCount = myCodeMirror.getValue().length;
@@ -33,14 +33,45 @@ $('#runButton').on('click', function(e) {
   myCodeMirror.on("mousedown", function () {
     mousedown = true;
   });
-  myCodeMirror.on('onKeyDown', function(e){
-    console.log('key');
-    console.log(e);
-    lastKeyPressed = e.which;
-  });
-
 });
 
+
+/**
+ * Function checkForPrint
+ * input: prog - text executed in program
+ * output: none
+ * Checks to see if uses new print statement for debugging
+**/
+  preEstablishedPrints = ["print midpoint(1,3,4,1)", "print takeOutNeg([2,-1,3,-5,0,1])", "print takeOutPos([2,-1,3,-5,0,1])"]
+  var lastPrints = [];
+  function checkForPrint(prog) {
+    stillPrints = true;
+    lastPrint = 0;
+    var thisPrints = [];
+
+    while(stillPrints){
+      // console.log('lastPrint'+lastPrint)
+      i = prog.indexOf("print", lastPrint)
+      lastPrint = i+1
+      if (i== -1){
+        stillPrints = false;
+      }
+      else {
+        printState = prog.substr(i).split("\n", 1)[0]
+        if (($.inArray(printState, preEstablishedPrints))<0){
+          if(($.inArray(printState, lastPrints))<0){
+            if (lastCompileSuccessful == false) {
+              console.log("metric NEWPRINT")
+            }
+          }
+          thisPrints.push(printState)
+        }
+      }
+    }
+    $.each(thisPrints, function(i, el){
+      lastPrints.push(el);
+    });
+  }
 
 /**
  * Function outf:()
@@ -75,25 +106,27 @@ function builtinRead(x) {
 var lastSetTimeout;
 function runit(myCodeMirror) {
   //get time between compilations
-   var d = new Date(); 
-   d.getTime();
-   var compileDelta = d - lastCompilation;
-   lastCompilation = d;
+    var d = new Date(); 
+    d.getTime();
+    var compileDelta = d - lastCompilation;
+    lastCompilation = d;
 
-   //run python code using skuplt
-   var prog = myCodeMirror.getValue(); 
-   var mypre = document.getElementById("output"); 
-   Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead}); 
-   var myPromise = Sk.misceval.asyncToPromise(function() {
+    //run python code using skuplt
+    var prog = myCodeMirror.getValue(); 
+    var mypre = document.getElementById("output"); 
+    Sk.pre = "output";
+    Sk.configure({output:outf, read:builtinRead}); 
+    var myPromise = Sk.misceval.asyncToPromise(function() {
        return Sk.importMainWithBody("<stdin>", false, prog, true);
-   });
-   myPromise.then(function(mod) {
+    });
+    checkForPrint(prog);
+    myPromise.then(function(mod) {
        console.log('success');
        mypre.innerHTML = mypre.innerHTML +  "\n>"; 
        $('#output').scrollTop($('#output')[0].scrollHeight);
-   },
-   function(err) {
+       lastCompileSuccessful = true;
+    },
+    function(err) {
        outf(err.toString());
        console.log(err);
        clearTimeout(lastSetTimeout);
@@ -103,8 +136,8 @@ function runit(myCodeMirror) {
     }, 30000)
        mypre.innerHTML = mypre.innerHTML +  "\n>"; 
        $('#output').scrollTop($('#output')[0].scrollHeight);
-   });
-     
+       lastCompileSuccessful = false;
+    });
 } 
 
 function editorChange(changeObj) {
@@ -171,9 +204,3 @@ function getErrLineNum(err) {
   var lineNum = err.traceback[0].lineno;
   return lineNum
 }
-
-// function onNewLine(e){
-//   console.log(e);
-//   myCodeMirror.replaceSelection("\n" ,"end");
-//   lastKeyPressed = 'enter';
-// }
