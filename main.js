@@ -58,7 +58,13 @@ $(document).ready(function(e) {
   myCodeMirror.on('cursorActivity',function(cMirror){
     metricCheckCursorChange(cMirror);
   });
+  randomTrigger()
+
 });
+
+function randomTrigger() {
+  setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*100)
+}
 
 
 /**
@@ -274,6 +280,9 @@ function metricCheckRunCodeError(err){
   metricsVars.lastCompileSuccessful = false;
 }
 
+function reward(){
+  document.getElementById("output").innerHTML += "\n great process: You are growing your skills! \n";
+};
 
 /**
  * Function checkForPrint
