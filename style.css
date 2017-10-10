@@ -1,12 +1,12 @@
 #output {
 	width: 50%;
-	height: 200px;
+	height: 250px;
 }
 
 /* Popup container */
 .popup {
     position: absolute;
-    top: 50px;
+    top: 68px;
     left: 1180px;
     padding:5px;
     display: inline-block;
