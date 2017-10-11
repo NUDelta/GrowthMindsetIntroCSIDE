@@ -63,7 +63,7 @@ $(document).ready(function(e) {
 });
 
 function randomTrigger() {
-  setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*100)
+  setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*1000)
 }
 
 
