@@ -18,6 +18,11 @@ var metricsVars = {
 var numLinesForCloseness = 5;
 var numErrorsForCycle = 5;
 
+// When the user clicks on <div>, open the popup
+function popup() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+}
 
 $(document).ready(function(e) {
   //set up codemirror editor
@@ -53,7 +58,13 @@ $(document).ready(function(e) {
   myCodeMirror.on('cursorActivity',function(cMirror){
     metricCheckCursorChange(cMirror);
   });
+  randomTrigger()
+
 });
+
+function randomTrigger() {
+  setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*1000)
+}
 
 
 /**
@@ -269,6 +280,9 @@ function metricCheckRunCodeError(err){
   metricsVars.lastCompileSuccessful = false;
 }
 
+function reward(){
+  document.getElementById("output").innerHTML += "\n great process: You are growing your skills! \n";
+};
 
 /**
  * Function checkForPrint
