@@ -6,6 +6,7 @@ var metricsVars = {
 
   lastComiplationTime: '',
   errorLineNum: '',
+  //metric to determine if there has been an error in the last 30 seconds
   editErrLineNumMetric: '',
   errorCycleCount : 0,
   lastCompileSuccessful: '',
@@ -17,13 +18,22 @@ var metricsVars = {
 var numLinesForCloseness = 5;
 var numErrorsForCycle = 5;
 
+// When the user clicks on <div>, open the popup
+function popup() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+}
 
 $(document).ready(function(e) {
   //set up codemirror editor
-  initialCode = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\nprint midpoint(1,3,4,1)\nprint takeOutNeg([2,-1,3,-5,0,1])\nprint takeOutPos([2,-1,3,-5,0,1])';
+  ProblemMessageA = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positinve numbers from a list."
+  initialCodeA = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\nprint midpoint(1,3,4,1)\nprint takeOutNeg([2,-1,3,-5,0,1])\nprint takeOutPos([2,-1,3,-5,0,1])';
+  
   var codeArea = document.getElementById('code');
-  codeArea.value= initialCode;
-  checkForPrint(initialCode, true);
+  codeArea.value= initialCodeA;
+  var taskArea = document.getElementById('task');
+  taskArea.value= ProblemMessageA;
+  checkForPrint(initialCodeA, true);
 
   myCodeMirror = CodeMirror.fromTextArea(codeArea, {
     mode:  "python",
@@ -52,12 +62,11 @@ $(document).ready(function(e) {
   });
 
 randomTrigger()
-
 });
 
 function randomTrigger() {
 
-  setInterval(function(){reward()}, (Math.random() * (30 - 20) + 20)*1000)
+  setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*1000)
 
 }
 
@@ -153,7 +162,6 @@ function getErrLineNum(err) {
 function metricCheckEditorChange(changeObj) {
   // keeping track of the last key that was pressed
   metricsVars.lastKeyPressed = changeObj.text[0];
-  //detecting errors
   if (changeObj.text.length == 2 && !changeObj.text[0] && !changeObj.text[1] ){
     metricsVars.lastKeyPressed = 'enter';
   }
@@ -169,11 +177,21 @@ function metricCheckEditorChange(changeObj) {
   metricsVars.charCount = newCharCount;
 
   //Evaluating Metric: editErrLineNum
-  if (metricsVars.editErrLineNumMetric){
-    console.log("METRIC editErrLineNum_edit");
+  if (metricsVars.lastCompileSuccessful){
+    if (Math.abs(myCodeMirror.changeObj.to.line - metricsVars.errorLineNum) < numLinesForCloseness){
+      if (metricsVars.editErrLineNumMetric){
+        console.log("METRIC editErrLineNum_edit");
+      }
+    }
+    else {
+        //if they edit somewhere else first, that doesn't count FOR editErrLineNumMetric
+        metricsVars.editErrLineNumMetric = false;
+        console.log("ANTI-metric Editing code directly after error not near error line (Avoidance)")
+
+        //edit not near error, so can't count for break out of error cycle
+        metricVars.errorCycleCount = 0;
+    }
   }
-  //if they edit somewhere else first, that doesn't count
-  metricsVars.editErrLineNumMetric = false;
 }
 
 /**
@@ -188,7 +206,7 @@ function metricCheckCursorChange(cMirror) {
   //Evaluating Metric: editErrLineNum
   if (metricsVars.editErrLineNumMetric){
     if (Math.abs(myCodeMirror.getCursor().line - metricsVars.errorLineNum) < numLinesForCloseness){
-      metricsVars.editErrLineNumMetric = false;
+    //  metricsVars.editErrLineNumMetric = false;
       console.log("METRIC editErrLineNum_cursor");
     }
   }
@@ -267,6 +285,9 @@ function metricCheckRunCodeError(err){
   metricsVars.lastCompileSuccessful = false;
 }
 
+function reward(){
+  document.getElementById("output").innerHTML += "\n great process: You are growing your skills! \n";
+};
 
 function reward(){
   document.getElementById("output").innerHTML += "\n great process: You are growing your skills! \n";
