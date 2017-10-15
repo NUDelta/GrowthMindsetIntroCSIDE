@@ -42,11 +42,9 @@ $(document).ready(function(e) {
     indentUnit: 4,
     lineNumbers: true,
   });
-
   // initializing character count of editor
   metricsVars.charCount = myCodeMirror.getValue().length;
-  
-  //Run button listener
+  $(".CodeMirror pre").css('font-size',"15 pt");
   $('#runButton').on('click', function(e) {
    runit(myCodeMirror);
   });
