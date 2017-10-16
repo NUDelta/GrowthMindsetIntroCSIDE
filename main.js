@@ -22,13 +22,28 @@ var numErrorsForCycle = 5;
 function popup() {
     var popup = document.getElementById("myPopup");
     popup.classList.toggle("show");
+    setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 3000);
 }
+
+$(document).keypress(function(event){
+  //listen for key events, trigger popup on 'p'
+  if (event.which == 112) {
+    popup();
+  }
+});
+
+// in case we want to use this later
+// function randomTrigger() {
+//
+//   setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*1000)
+//
+// }
 
 $(document).ready(function(e) {
   //set up codemirror editor
   ProblemMessageA = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positinve numbers from a list."
   initialCodeA = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\nprint midpoint(1,3,4,1)\nprint takeOutNeg([2,-1,3,-5,0,1])\nprint takeOutPos([2,-1,3,-5,0,1])';
-  
+
   var codeArea = document.getElementById('code');
   codeArea.value= initialCodeA;
   var taskArea = document.getElementById('task');
@@ -56,17 +71,13 @@ $(document).ready(function(e) {
 
   myCodeMirror.on('cursorActivity',function(cMirror){
     metricCheckCursorChange(cMirror);
-    
+
   });
 
-randomTrigger()
+// randomTrigger()
 });
 
-function randomTrigger() {
 
-  setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*1000)
-
-}
 
 
 /**
@@ -75,13 +86,13 @@ function randomTrigger() {
  * output: none
  * Displays output text in html output div as a new paragraph
 */
-function consoleOutputResult(text) { 
+function consoleOutputResult(text) {
   if (!text.trim()){}
   else{
-    var consoleOutputArea = document.getElementById("output"); 
-    consoleOutputArea.innerHTML = consoleOutputArea.innerHTML + "\n"+text ; 
+    var consoleOutputArea = document.getElementById("output");
+    consoleOutputArea.innerHTML = consoleOutputArea.innerHTML + "\n"+text ;
   }
-} 
+}
 /**
  * Function builtinRead:()
  * input: x
@@ -101,7 +112,7 @@ function builtinRead(x) {
  * after run adds a new line and carrrot and forces the console to scroll to the bottom.
 */
 function consoleOutputAfterRun(consoleOutputArea){
-  consoleOutputArea.innerHTML = consoleOutputArea.innerHTML +  "\n>"; 
+  consoleOutputArea.innerHTML = consoleOutputArea.innerHTML +  "\n>";
   $('#output').scrollTop($('#output')[0].scrollHeight);
 }
 
@@ -113,15 +124,15 @@ function consoleOutputAfterRun(consoleOutputArea){
 */
 var lastSetTimeout;
 function runit(myCodeMirror) {
-  //get code text from web console 
+  //get code text from web console
   var prog = myCodeMirror.getValue();
 
   metricCheckRunCode(prog)
 
   //run python code using skuplt
-  var consoleOutputArea = document.getElementById("output"); 
+  var consoleOutputArea = document.getElementById("output");
   Sk.pre = "output";
-  Sk.configure({output:consoleOutputResult, read:builtinRead}); 
+  Sk.configure({output:consoleOutputResult, read:builtinRead});
   var myPromise = Sk.misceval.asyncToPromise(function() {
      return Sk.importMainWithBody("<stdin>", false, prog, true);
   });
@@ -139,7 +150,7 @@ function runit(myCodeMirror) {
     metricCheckRunCodeError(err);
   });
 
-} 
+}
 
 /*  getErrLineNum
     inputs: msg - string of error message
@@ -218,13 +229,13 @@ function metricCheckCursorChange(cMirror) {
 */
 function metricCheckRunCode(prog){
   //get time between compilations
-  var d = new Date(); 
+  var d = new Date();
   d.getTime();
   // Time between current compile and previous compile
   var compileDelta = d - metricsVars.lastComiplationTime;
   metricsVars.lastComiplationTime = d;
 
-  //Check to see if user made any changes between compiles 
+  //Check to see if user made any changes between compiles
   // makes sure last compile was .5 second before to make sure it wasn't double click
   if (prog == metricsVars.lastCompiledCode && compileDelta > 500 ){
     console.log('ANTI-metric: No change between compiles');
@@ -248,7 +259,7 @@ function metricCheckRunCodeSuccess(){
     console.log("METRIC: breakOutOfErrCycle");
   }
   errCycleCount = 0;
-  metricsVars.lastCompileSuccessful = true; 
+  metricsVars.lastCompileSuccessful = true;
 }
 
 /**
@@ -277,21 +288,19 @@ function metricCheckRunCodeError(err){
   metricsVars.editErrLineNumMetric = true;
 
   // set timer to reset metric for err line number edit
-  lastSetTimeout = setTimeout(function(){ 
+  lastSetTimeout = setTimeout(function(){
     metricsVars.editErrLineNumMetric = false;
-  }, 30000) 
+  }, 30000)
   metricsVars.lastCompileSuccessful = false;
 }
 
-function reward(){
-  document.getElementById("output").innerHTML += "\n great process: You are growing your skills! \n";
-};
+
 
 function reward(){
   document.getElementById("output").innerHTML += "\n great process: You are growing your skills! \n";
 };
 
- 
+
 
 
 /**
@@ -329,7 +338,7 @@ function checkForPrint(prog, init) {
             console.log("metric NEWPRINT")
           }
         }
-      }   
+      }
     }
   }
   // copy the contents of this prints to the variable lastPrints to remember for next compile
