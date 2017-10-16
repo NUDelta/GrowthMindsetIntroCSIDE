@@ -22,7 +22,16 @@ var numErrorsForCycle = 5;
 function popup() {
     var popup = document.getElementById("myPopup");
     popup.classList.toggle("show");
+    points();
     setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 3000);
+}
+
+// When the user gets a popup, increase points by 1
+function points() {
+    var myPoints = document.getElementById("myPoints");
+    var totalPoints = myPoints.innerHTML.split(": ")[1];
+    myPoints.innerHTML = parseInt(totalPoints) + 1;
+    myPoints.innerHTML = "Total Points: " + myPoints.innerHTML;
 }
 
 $(document).keypress(function(event){

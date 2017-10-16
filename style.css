@@ -23,10 +23,21 @@ body{
     border-radius: 8px;
 }
 
+/* Display the points */
+.points {
+    position: absolute;
+    top: 0px;
+    left: 455px;
+    padding:5px;
+    display: inline-block;
+    cursor: pointer;
+    color: #4CAF50;
+}
+
 /* Popup container */
 .popup {
     position: absolute;
-    top: 50px;
+    top: 100px;
     left: 500px;
     padding:5px;
     display: inline-block;
