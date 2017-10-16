@@ -18,6 +18,26 @@ var metricsVars = {
 var numLinesForCloseness = 5;
 var numErrorsForCycle = 5;
 
+// When the user clicks on <div>, open the popup
+function popup() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+    setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 3000);
+}
+
+$(document).keypress(function(event){
+  //listen for key events, trigger popup on 'p'
+  if (event.which == 112) {
+    popup();
+  }
+});
+
+// in case we want to use this later
+// function randomTrigger() {
+//
+//   setInterval(function(){popup()}, (Math.random() * (30 - 20) + 20)*1000)
+//
+// }
 
 $(document).ready(function(e) {
   //set up codemirror editor
@@ -37,11 +57,9 @@ $(document).ready(function(e) {
     indentUnit: 4,
     lineNumbers: true,
   });
-
   // initializing character count of editor
   metricsVars.charCount = myCodeMirror.getValue().length;
-
-  //Run button listener
+  $(".CodeMirror pre").css('font-size',"15 pt");
   $('#runButton').on('click', function(e) {
    runit(myCodeMirror);
   });
@@ -56,15 +74,11 @@ $(document).ready(function(e) {
 
   });
 
-randomTrigger()
-
+// randomTrigger()
 });
 
-function randomTrigger() {
 
-  setInterval(function(){reward()}, (Math.random() * (30 - 20) + 20)*1000)
 
-}
 
 /**
  * Function consoleOutputResult:()
@@ -280,13 +294,6 @@ function metricCheckRunCodeError(err){
   metricsVars.lastCompileSuccessful = false;
 }
 
-
-function reward(){
-  var snackbar = document.getElementById("snackbar")
-  snackbar.className = "show";
-  // After 3 seconds, remove the show class from DIV
-  setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 3000);
-};
 
 
 /**
