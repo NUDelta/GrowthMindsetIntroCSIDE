@@ -1,19 +1,17 @@
+#output {
+	width: 50%;
+	height: 200px;
+}
+
 body{
     background-color: #272823;
     margin-top: 8px;
 }
-#outputarea{
 
+#task{
+    background-color: #fff;
 }
-#output {
-	width: 100%;
-	height: 200px;
-    border: 0;
-    border-top: 1px solid grey;
-    background-color: #272823;
-    color: white;
-    font-size: 12px;
-}
+
 #runButton{
     background-color: #4CAF50; /* Green */
     border: none;
@@ -23,10 +21,10 @@ body{
     text-decoration: none;
     display: inline-block;
     float: right;
-    float: bottom;
     font-size: 14px;
     border-radius: 6px;
 }
+
 #triangle{
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
@@ -113,4 +111,46 @@ body{
 @keyframes fadeout {
     from {opacity: 1;}
     to {opacity: 0;}
+}
+
+/* The console container element */
+#console {
+  position: absolute;
+  width: 800px;
+  height: 400px;
+  background-color:black;
+}
+/* The inner console element. */
+.jqconsole {
+    padding: 10px;
+}
+/* The cursor. */
+.jqconsole-cursor {
+    background-color: gray;
+}
+/* The cursor color when the console looses focus. */
+.jqconsole-blurred .jqconsole-cursor {
+    background-color: #666;
+}
+/* The current prompt text color */
+.jqconsole-prompt {
+    color: #0d0;
+}
+/* The command history */
+.jqconsole-old-prompt {
+    color: #0b0;
+    font-weight: normal;
+}
+/* The text color when in input mode. */
+.jqconsole-input {
+    color: #dd0;
+}
+/* Previously entered input. */
+.jqconsole-old-input {
+    color: #bb0;
+    font-weight: normal;
+}
+/* The text color of the output. */
+.jqconsole-output {
+    color: white;
 }
