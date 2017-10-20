@@ -12,31 +12,23 @@
 	<script src="node_modules/requirejs/require.js"></script>
 	<script src="http://www.skulpt.org/static/skulpt.min.js" type="text/javascript"></script>
 	<script src="http://www.skulpt.org/static/skulpt-stdlib.js" type="text/javascript"></script>
+    <script src="jqconsole/lib/jqconsole.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-        <div class="editorArea" id="editorArea"></div>
-        <div id="task"></div>
-		<textarea id="code" name="code">
-
-		</textarea>
-        <textarea id="output" name="output">out</textarea>
-        <button id="runButton">Run</button>
-
-        <div class="points" id="myPoints">Total Points: 0</div>
-        <div class="popup" onclick="popup()">
-   		<span class="popuptext" id="myPopup">
-   			<div>
-   				Great process: You are growing your skills! 
-   			</div>
-   			<div>
-   				+1 point
-   			</div>
-   		</span>
-  </div>
-
+	<select id="problemSelect" name="problemSelect"> 
+	  <option value="A">Development Easy</option>
+	  <option value="B">Development Medium</option>
+	  <option value="C">Development Medium 2 </option>
+	  <option value="D">Debugging Easy</option>
+  	  <option value="E">Debugging Medium</option>
+	</select>
+    <div class="editorArea" id="editorArea"></div>
+    <div id="task"></div>
+	<textarea id="code" name="code"></textarea>
+    <div id=runCode>
+    	<div id="runButton">Run</div>
+    </div>
+    <div id="console"></div>
 </body>
 <script src="main.js"></script>
-<!-- <script src="message.js"></script>  -->
-
-
 </html>
