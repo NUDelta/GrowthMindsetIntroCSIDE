@@ -24,6 +24,10 @@ body{
     font-size: 14px;
     border-radius: 6px;
 }
+#runButtonWrapper{
+    padding-top: 10px;
+    padding-right: 10px;
+}
 
 #triangle{
     border-top: 8px solid transparent;
@@ -112,11 +116,16 @@ body{
     from {opacity: 1;}
     to {opacity: 0;}
 }
-
+#runCode{
+    background-color: black;
+    float: right;
+    height: 400px;
+    width: 10%
+}
 /* The console container element */
 #console {
   position: absolute;
-  width: 800px;
+  width: 90%;
   height: 400px;
   background-color:black;
 }
