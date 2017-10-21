@@ -9,7 +9,8 @@ body{
 }
 
 #task{
-    background-color: #fff;
+    background-color: #272823;
+    color: white;
 }
 
 #runButton{
@@ -26,7 +27,7 @@ body{
 }
 #runButtonWrapper{
     padding-top: 10px;
-    padding-right: 10px;
+    padding-right: 5px;
 }
 
 #triangle{
@@ -117,15 +118,15 @@ body{
     to {opacity: 0;}
 }
 #runCode{
-    background-color: black;
     float: right;
-    height: 400px;
+    height: 450px;
     width: 10%
 }
 /* The console container element */
 #console {
+  margin-top: 50px;
   position: absolute;
-  width: 90%;
+  width: 100%;
   height: 400px;
   background-color:black;
 }
