@@ -57,9 +57,9 @@ body{
 /* Popup container */
 .popup {
     position: absolute;
-    top: 60px;
+    top: 100px;
     left: 44%;
-    padding:5px;
+    padding: 5px;
     display: inline-block;
     cursor: pointer;
 }
@@ -72,12 +72,11 @@ body{
     color: #eee;
     text-align: center;
     border-radius: 6px;
-    padding: 8px 0;
+    padding: 10px 10px;
     position: absolute;
     z-index: 1;
     bottom: 125%;
     left: 50%;
-    margin-left: -80px;
     font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 }
 #header{
