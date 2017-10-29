@@ -62,11 +62,6 @@ function points(value) {
     myPoints.innerHTML = "Total Points: " + myPoints.innerHTML;
 }
 
-function masteredStrategies() {
-  // could theoretically initialize strategies array to zeros here 
-  // based on metricsVars to make sure the two arrays are consistent
-}
-
 $(document).ready(function(e) {
   //set up codemirror editor
   ProblemMessageA = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positive numbers from a list."
