@@ -245,7 +245,6 @@ function metricCheckEditorChange(changeObj) {
     console.log("METRIC: Paste");
     popup('Do you understand what the code you just pasted does?', 1);
     strategiesCount.copyPasted += 1;
-    console.log(strategiesCount)
     //check to see if it was pasted from content inside code
     var prog = myCodeMirror.getValue();
     var dupPaste = checkNewDup(prog, changeObj.text);
