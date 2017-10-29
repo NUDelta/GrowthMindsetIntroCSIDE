@@ -24,6 +24,19 @@ var minSkel = .3; //minimum ratio for skel
 var maxSkel = .9; // maximum ratio for skel
 var secondsForSkel = 240;
 
+// Keep track of the number of times each strategy is triggered
+var strategiesCount = {
+  //Edit code near line error (do we want to subtract one if they don't do this?)
+  editErrLineNum: 0,
+  //broke and error cycle
+  breakOutOfErrCycle : 0,
+  //copy and pasted code
+  copyPasted: 0,
+  //negative 1 if run code without making any changes
+  //plus 1 with print statements
+  debugWithPrint: 0,
+}
+
 // When the user clicks on <div>, open the popup
 function popup(message, value) {
     var popup = document.getElementById("myPopup");
@@ -41,12 +54,17 @@ function popup(message, value) {
     setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 3000);
 }
 
-// When the user gets a popup, increase points by 1
+// When the user gets a popup, increase points by value
 function points(value) {
     var myPoints = document.getElementById("myPoints");
     var totalPoints = myPoints.innerHTML.split(": ")[1];
     myPoints.innerHTML = parseInt(totalPoints) + value;
     myPoints.innerHTML = "Total Points: " + myPoints.innerHTML;
+}
+
+function masteredStrategies() {
+  // could theoretically initialize strategies array to zeros here 
+  // based on metricsVars to make sure the two arrays are consistent
 }
 
 $(document).ready(function(e) {
@@ -226,12 +244,13 @@ function metricCheckEditorChange(changeObj) {
   if (changeObj.from.line == changeObj.to.line && changeObj.from.ch == changeObj.to.ch){
     // added one character
   }
-
   //character count of editor
   newCharCount = myCodeMirror.getValue().length;
   if (newCharCount-metricsVars.charCount > 2 && metricsVars.lastKeyPressed !='enter'){
     console.log("METRIC: Paste");
     popup('Do you understand what the code you just pasted does?', 1);
+    strategiesCount.copyPasted += 1;
+    console.log(strategiesCount)
     //check to see if it was pasted from content inside code
     var prog = myCodeMirror.getValue();
     var dupPaste = checkNewDup(prog, changeObj.text);
@@ -281,6 +300,7 @@ function metricCheckEditorChange(changeObj) {
       console.log("METRIC editErrLineNum_edit");
       metricsVars.editErrLineNumMetric = false;
       popup('You focused on the area of code that gave you the error.', 1);
+      strategiesCount.editErrLineNum += 1;
     }
     else {
         //if they edit somewhere else first, that doesn't count FOR editErrLineNumMetric
@@ -308,6 +328,7 @@ function metricCheckCursorChange(cMirror) {
       console.log("METRIC editErrLineNum_cursor");
       metricsVars.editErrLineNumMetric = false;
       popup('You focused on the area of code that gave you the error.', 1);
+      strategiesCount.editErrLineNum += 1;
     }
   }
 }
@@ -350,6 +371,7 @@ function metricCheckRunCodeSuccess(){
   if (metricsVars.errorCycleCount > numErrorsForCycle) {
     console.log("METRIC: breakOutOfErrCycle");
     popup('You broke the error cycle.', 1);
+    strategiesCount.breakOutOfErrCycle += 1;
   }
   errCycleCount = 0;
   metricsVars.lastCompileSuccessful = true;
@@ -374,6 +396,7 @@ function metricCheckRunCodeError(err){
       if (currentErrLineNum > metricsVars.errorLineNum && metricsVars.errorCycleCount > numErrorsForCycle) {
         console.log("METRIC: breakOutOfErrCycle");
         popup('You broke the error cycle.', 1);
+        strategiesCount.breakOutOfErrCycle += 1;
       }
       metricsVars.errorCycleCount = 0;
     }
@@ -423,6 +446,7 @@ function checkForPrint(prog, init) {
           if (metricsVars.lastCompileSuccessful == false) {
             console.log("metric NEWPRINT")
             popup('You debugged, which can help you understand the cause of your error.', 1);
+            strategiesCount.debugWithPrint += 1;
           }
         }
       }
