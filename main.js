@@ -577,3 +577,11 @@ function checkNewDup(prog, addedCode){
   duplicateMatrix = createMatrixfromTwoArrays(codeArray, addedCodeCleaned, duplicateMatrix);
   return countDupsFromMatrix(duplicateMatrix, addedCodeCleaned.length);
 }
+
+function openNav() {
+    document.getElementById("mySidenav").style.width = "250px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
