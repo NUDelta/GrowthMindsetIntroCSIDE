@@ -51,7 +51,7 @@ function popup(message, value) {
     }
     popup.classList.toggle("show");
     points(value);
-    setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 3000);
+    setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 5000);
 }
 
 // When the user gets a popup, increase points by value
@@ -65,7 +65,7 @@ function points(value) {
 $(document).ready(function(e) {
   //set up codemirror editor
   ProblemMessageA = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positive numbers from a list."
-  initialCodeA = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\nprint midpoint(1,3,4,1)\nprint takeOutNeg([2,-1,3,-5,0,1])\nprint takeOutPos([2,-1,3,-5,0,1])';
+  initialCodeA = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\n#uncomment these test cases to test your functions\n#assert midpoint(1,3,5,1)==(3, 2)\n#assert takeOutNeg([2,-1,3,-5,0,1])==[2,3,0,1]\n#assert takeOutPos([2,-1,3,-5,0,1])==[-1,-5]';
 
   var codeArea = document.getElementById('code');
   codeArea.value= initialCodeA;
@@ -126,15 +126,15 @@ $(document).ready(function(e) {
 function selectProblem(letter) {
   if (letter == 'A'){
     problemMessage = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positive numbers from a list.";
-    initialCode = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\nprint midpoint(1,3,4,1)\nprint takeOutNeg([2,-1,3,-5,0,1])\nprint takeOutPos([2,-1,3,-5,0,1])';
+    initialCode = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\n#uncomment these test cases to test your functions\n#assert midpoint(1,3,5,1)==(3, 2)\n#assert takeOutNeg([2,-1,3,-5,0,1])==[2,3,0,1]\n#assert takeOutNeg([])==[]\n#assert takeOutPos([2,-1,3,-5,0,1])==[-1,-5]';
   }
   if (letter == 'B'){
     problemMessage = "Write a Python program to add two binary numbers.";
-    initialCode = "def addBinary(x, y):\n\treturn 0\n\naddBinary (1,11)";
+    initialCode = "def addBinary(x, y):\n\treturn 0\n\n#uncomment the test cases to test your function\n#assert addBinary(1,11)==100";
   }
   if (letter == 'C') {
     problemMessage = " Using the Python language, have the function alphabetSoup(str) take the str string parameter being passed and return the string with the letters in alphabetical order (ie. hello becomes ehllo). Assume numbers and punctuation symbols will not be included in the string.";
-    initialCode = "def alphabetSoup(str):\n\treturn 0\n\nalphabetSoup('delta')\nalphabetSoup('')";
+    initialCode = "def alphabetSoup(str):\n\treturn 0\n\n#uncomment these test cases to test your function\n#assert alphabetSoup('delta')=='adelt'\n#assert alphabetSoup('')==''";
   }
   if (letter == 'D'){
     problemMessage = "Debug the following code that creates a multiplication quiz app";
@@ -220,6 +220,7 @@ function runit(myCodeMirror) {
 */
 function getErrLineNum(err) {
   var lineNum = err.traceback[0].lineno;
+  console.log(err.traceback);
   return lineNum
 }
 
@@ -257,7 +258,7 @@ function metricCheckEditorChange(changeObj) {
         if (dupPaste - dupAfterTime >= 2 && dupAfterTime >=1){
           console.log("METRIC: refactor")
           clearInterval(pasteInterval);
-          // popup(); unclear what this is doing atm
+          popup('You refactored your code.', 1);
         }
         timesRun += 1;
         if(timesRun === 60){
@@ -282,7 +283,7 @@ function metricCheckEditorChange(changeObj) {
 
       if (ratioSkel > minSkel && ratioSkel < maxSkel){
         console.log("METRIC: Skel")
-        //popup(); unclear what this is doing atm
+        popup('You used your pasted code as skeleton code.', 1);
       }
     }, secondsForSkel *Math.pow(10,3))
   }
@@ -300,7 +301,7 @@ function metricCheckEditorChange(changeObj) {
         //if they edit somewhere else first, that doesn't count FOR editErrLineNumMetric
         metricsVars.editErrLineNumMetric = false;
         console.log("ANTI-metric Editing code directly after error not near error line (Avoidance)")
-        popup('Make sure you understand why you are getting errors', -1);
+        //popup('Make sure you understand why you are getting errors', -1); this is messing up assert statements
         //edit not near error, so can't count for break out of error cycle
         metricsVars.errorCycleCount = 0;
     }
@@ -364,6 +365,7 @@ function metricCheckRunCodeSuccess(){
   //evaluate if broken error cycle
   if (metricsVars.errorCycleCount > numErrorsForCycle) {
     console.log("METRIC: breakOutOfErrCycle");
+
     popup('You broke the error cycle.', 1);
     strategiesCount.breakOutOfErrCycle += 1;
   }
@@ -389,6 +391,7 @@ function metricCheckRunCodeError(err){
     else {
       if (currentErrLineNum > metricsVars.errorLineNum && metricsVars.errorCycleCount > numErrorsForCycle) {
         console.log("METRIC: breakOutOfErrCycle");
+        
         popup('You broke the error cycle.', 1);
         strategiesCount.breakOutOfErrCycle += 1;
       }
