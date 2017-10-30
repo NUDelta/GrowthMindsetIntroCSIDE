@@ -54,6 +54,7 @@ body{
     background-color: grey;
     margin: 3px 0;
 }
+
 #sidenavHeader{
     height: 50px;
     font-size: 25px;
@@ -64,9 +65,22 @@ body{
     height: 40px;
     border-bottom: 1px solid grey;
     font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
-
-
 }
+
+.strategyPoints{
+    color: white;
+    padding-top: 20px;
+    width: 40px;
+    margin-right: 0px;
+    float: right;
+    line-height: 40px;
+    padding-right: 5px;
+}
+.strategyWrapper{
+    width: 100%;
+    float: right;
+}
+
 /* Popup container */
 .popup {
     position: absolute;
@@ -206,20 +220,20 @@ body{
     font-size: 25px;
     margin-left: 50px;
 }
-.sidenav .navElement {
+.navElement {
     font-size: 20px;
     background-color: #4CAF50; /* Green */
     border: none;
     color: white;
-    padding: 8px 15px;
+    padding: 10px 3px;
     text-decoration: none;
     display: inline-block;
-    float: right;
+    float: left;
     font-size: 16px;
     border-radius: 1px;
-    width: 200px;
+    width: 185px;
     margin-top: 20px;
-    margin-right: 10px;
+    margin-left: 10px;
     text-align: left;
     font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 
