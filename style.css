@@ -3,10 +3,129 @@
 	height: 200px;
 }
 
+body{
+    background-color: #272823;
+    margin-top: 8px;
+}
+
+#task{
+    background-color: #272823;
+    color: white;
+}
+
+#runButton{
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    float: right;
+    font-size: 14px;
+    border-radius: 6px;
+}
+#runButtonWrapper{
+    padding-top: 10px;
+    padding-right: 5px;
+}
+
+#triangle{
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid white;
+    margin-left: 2px;
+}
+
+/* Display the points */
+.points {
+    top: 0px;
+    padding:5px;
+    display: inline-block;
+    cursor: pointer;
+    color: grey;
+    float: right;
+    padding-left: 20px;
+}
+.menubar{
+    width: 20px;
+    height: 3px;
+    background-color: grey;
+    margin: 3px 0;
+}
+
+/* Popup container */
+.popup {
+    position: absolute;
+    top: 100px;
+    left: 44%;
+    padding: 5px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* The actual popup (appears on top) */
+.popup .popuptext {
+    visibility: hidden;
+    width: 300px;
+    background-color: #4CAF50;
+    color: #eee;
+    text-align: center;
+    border-radius: 6px;
+    padding: 10px 10px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
+}
+#header{
+    height: 33px;
+    border-bottom: 1px solid grey;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.popup .show {
+    visibility: visible;
+    /*-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+}
+.CodeMirror{
+    height: 400px;
+    padding-top: 10px;
+    padding-left: 5px;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {opacity: 1;}
+    to {opacity: 0;}
+}
+#runCode{
+    float: right;
+    height: 450px;
+    width: 10%
+}
 /* The console container element */
 #console {
+  margin-top: 50px;
   position: absolute;
-  width: 800px;
+  width: 100%;
   height: 400px;
   background-color:black;
 }

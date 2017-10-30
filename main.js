@@ -1,6 +1,6 @@
 var myCodeMirror;
 var jqconsole;
-// variables that need to be kept track of for metrics
+
 var metricsVars = {
   charCount: '',
   lastKeyPressed: '',
@@ -11,22 +11,68 @@ var metricsVars = {
   editErrLineNumMetric: '',
   errorCycleCount : 0,
   lastCompileSuccessful: true,
-
   lastCompiledCode: ''
 }
 
 //parameters for metrics
 var numLinesForCloseness = 5;
 var numErrorsForCycle = 5;
+
 var numLinesForDupCode = 3;
 var numLinesSkeletonExtra = 10; // num lines past paste that the skeleton can go
 var minSkel = .3; //minimum ratio for skel
 var maxSkel = .9; // maximum ratio for skel
 var secondsForSkel = 240;
 
+// Keep track of the number of times each strategy is triggered
+var strategiesCount = {
+  //Edit code near line error (do we want to subtract one if they don't do this?)
+  editErrLineNum: 0,
+  //broke and error cycle
+  breakOutOfErrCycle : 0,
+  //copy and pasted code
+  copyPasted: 0,
+  //negative 1 if run code without making any changes
+  //plus 1 with print statements
+  debugWithPrint: 0,
+}
+
+// When the user clicks on <div>, open the popup
+function popup(message, value) {
+    var popup = document.getElementById("myPopup");
+    var popupText = document.getElementById("message");
+    var pointMessage = document.getElementById("pointMessage");
+    popupText.innerHTML = message;
+    if (value > 0) {
+      pointMessage.innerHTML = '+' + value.toString() + ' point';
+    }
+    else {
+      pointMessage.innerHTML = value.toString() + ' point';
+    }
+    popup.classList.toggle("show");
+    points(value);
+    setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 5000);
+}
+
+// When the user gets a popup, increase points by value
+function points(value) {
+    var myPoints = document.getElementById("myPoints");
+    var totalPoints = myPoints.innerHTML.split(": ")[1];
+    myPoints.innerHTML = parseInt(totalPoints) + value;
+    myPoints.innerHTML = "Total Points: " + myPoints.innerHTML;
+}
+
 $(document).ready(function(e) {
-  
   //set up codemirror editor
+  ProblemMessageA = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positive numbers from a list."
+  initialCodeA = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\n#uncomment these test cases to test your functions\n#assert midpoint(1,3,5,1)==(3, 2)\n#assert takeOutNeg([2,-1,3,-5,0,1])==[2,3,0,1]\n#assert takeOutPos([2,-1,3,-5,0,1])==[-1,-5]';
+
+  var codeArea = document.getElementById('code');
+  codeArea.value= initialCodeA;
+  var taskArea = document.getElementById('task');
+  taskArea.value= ProblemMessageA;
+  checkForPrint(initialCodeA, true);
+
   myCodeMirror = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode:  "python",
     theme: 'monokai',
@@ -38,9 +84,9 @@ $(document).ready(function(e) {
   // initialize the problem choice & set up dropdown change listener
   selectProblem(document.getElementById("problemSelect").value);
   document.getElementById("problemSelect").onchange=function() {
-    selectProblem(this.value);
+   selectProblem(this.value);
   }
-  
+
   //Run button listener
   $('#runButton').on('click', function(e) {
    runit(myCodeMirror);
@@ -62,10 +108,10 @@ $(document).ready(function(e) {
   });
 
   // CodeMirror editor Listeners
-  myCodeMirror.on('change', function(cMirror, change){
+  myCodeMirror.on('change',function(cMirror, change){
     metricCheckEditorChange(change);
   });
-  myCodeMirror.on('cursorActivity', function(cMirror){
+  myCodeMirror.on('cursorActivity',function(cMirror){
     metricCheckCursorChange(cMirror);
   });
 });
@@ -79,16 +125,16 @@ $(document).ready(function(e) {
 */
 function selectProblem(letter) {
   if (letter == 'A'){
-    problemMessage = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positinve numbers from a list.";
-    initialCode = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\nprint midpoint(1,3,4,1)\nprint takeOutNeg([2,-1,3,-5,0,1])\nprint takeOutPos([2,-1,3,-5,0,1])';
+    problemMessage = "Write three Python functions: 1) to calculate midpoints of a line; 2) to take out negative numbers from a list; 3) to take out positive numbers from a list.";
+    initialCode = 'def midpoint(x1, y1, x2, y2):\n\t#code here\n\treturn (0,0)\n\ndef takeOutNeg(listy):\n\t#code here\n\treturn []\n\ndef takeOutPos(listy):\n\t#code here\n\treturn []\n\n#uncomment these test cases to test your functions\n#assert midpoint(1,3,5,1)==(3, 2)\n#assert takeOutNeg([2,-1,3,-5,0,1])==[2,3,0,1]\n#assert takeOutNeg([])==[]\n#assert takeOutPos([2,-1,3,-5,0,1])==[-1,-5]';
   }
   if (letter == 'B'){
     problemMessage = "Write a Python program to add two binary numbers.";
-    initialCode = "def addBinary(x, y):\n\treturn 0\n\naddBinary (1,11)";
+    initialCode = "def addBinary(x, y):\n\treturn 0\n\n#uncomment the test cases to test your function\n#assert addBinary(1,11)==100";
   }
   if (letter == 'C') {
     problemMessage = " Using the Python language, have the function alphabetSoup(str) take the str string parameter being passed and return the string with the letters in alphabetical order (ie. hello becomes ehllo). Assume numbers and punctuation symbols will not be included in the string.";
-    initialCode = "def alphabetSoup(str):\n\treturn 0\n\nalphabetSoup('delta')\nalphabetSoup('')";
+    initialCode = "def alphabetSoup(str):\n\treturn 0\n\n#uncomment these test cases to test your function\n#assert alphabetSoup('delta')=='adelt'\n#assert alphabetSoup('')==''";
   }
   if (letter == 'D'){
     problemMessage = "Debug the following code that creates a multiplication quiz app";
@@ -98,7 +144,7 @@ function selectProblem(letter) {
     problemMessage = "Implement the function unique_in_order which takes as argument a sequence and returns a list of items without any elements with the same value next to each other and preserving the original order of elements.\nFor example:\nunique_in_order('AAAABBBCCDAABBB') == ['A', 'B', 'C', 'D', 'A', 'B']\nunique_in_order('ABBCcAD')         == ['A', 'B', 'C', 'c', 'A', 'D']\nunique_in_order([1,2,2,3,3])       == [1,2,3]";
     initialCode = "def unique_in_order(iterable):\n\toutput = []\n\toutput.append(iterable[0])\n\n\tfor i in len(iterable):\n\t\tif iterable[i+1] != iterable[i]:\n\t\t\toutput.append(iterable[i+1])\n\nunique_in_order('AAAABBBCCDAABBB')\nunique_in_order('')\nunique_in_order('B')";
   }
- 
+
   //metricVar initialization
   metricsVars.charCount = initialCode.length; // reinitializing character count of editor so it doesn't seem like it is a paste
   checkForPrint(initialCode, true); // reinitialize print statements
@@ -115,12 +161,12 @@ function selectProblem(letter) {
  * output: none
  * Displays output text in html output div as a new paragraph
 */
-function consoleOutputResult(text) { 
+function consoleOutputResult(text) {
   if (!text.trim()){}
   else{
     jqconsole.Write(text + '\n', 'jqconsole-output');
   }
-} 
+}
 /**
  * Function builtinRead:()
  * input: x
@@ -141,20 +187,17 @@ function builtinRead(x) {
 */
 var lastSetTimeout;
 function runit(myCodeMirror) {
-  //get code text from web console 
+  //get code text from web console
   var prog = myCodeMirror.getValue();
-  // write a carrot between runs
+
+  //writes carrot between runs lol
   jqconsole.Write('>', 'jqconsole-prompt');
 
-  //check for duplication
-  detectCodeDuplication(prog);
-  
-  // check metrics relevant to running code
-  metricCheckRunCode(prog);
+  metricCheckRunCode(prog)
 
   //run python code using skuplt
   Sk.pre = "output";
-  Sk.configure({output:consoleOutputResult, read:builtinRead}); 
+  Sk.configure({output:consoleOutputResult, read:builtinRead});
   var myPromise = Sk.misceval.asyncToPromise(function() {
      return Sk.importMainWithBody("<stdin>", false, prog, true);
   });
@@ -169,7 +212,7 @@ function runit(myCodeMirror) {
     console.log(err);
     metricCheckRunCodeError(err);
   });
-} 
+}
 
 /*  getErrLineNum
     inputs: msg - string of error message
@@ -177,6 +220,7 @@ function runit(myCodeMirror) {
 */
 function getErrLineNum(err) {
   var lineNum = err.traceback[0].lineno;
+  console.log(err.traceback);
   return lineNum
 }
 
@@ -196,25 +240,25 @@ function metricCheckEditorChange(changeObj) {
   if (changeObj.from.line == changeObj.to.line && changeObj.from.ch == changeObj.to.ch){
     // added one character
   }
-
   //character count of editor
   newCharCount = myCodeMirror.getValue().length;
-  // check to see if there is a new paste
   if (newCharCount-metricsVars.charCount > 2 && metricsVars.lastKeyPressed !='enter'){
-    console.log("Metric: Paste")
-
+    console.log("METRIC: Paste");
+    popup('Do you understand what the code you just pasted does?', 1);
+    strategiesCount.copyPasted += 1;
     //check to see if it was pasted from content inside code
     var prog = myCodeMirror.getValue();
     var dupPaste = checkNewDup(prog, changeObj.text);
     //check to see if code was pasted to create a helper function
     if (dupPaste>1){
       var timesRun = 0;
-      var pasteInterval =setInterval(function(){ 
+      var pasteInterval =setInterval(function(){
         var prog = myCodeMirror.getValue();
         dupAfterTime = checkNewDup(prog, changeObj.text);
         if (dupPaste - dupAfterTime >= 2 && dupAfterTime >=1){
           console.log("METRIC: refactor")
           clearInterval(pasteInterval);
+          popup('You refactored your code.', 1);
         }
         timesRun += 1;
         if(timesRun === 60){
@@ -227,7 +271,7 @@ function metricCheckEditorChange(changeObj) {
     var skeletonTimer = setTimeout(function(){
       var countSame = 0;
       var prog = (myCodeMirror.getValue().split("\n"));
-    
+
       var pasteText =  changeObj.text.filter(String);
       console.log(pasteText);
       for (var i = changeObj.to.line; i < changeObj.from.line+changeObj.text.length + 1 + numLinesSkeletonExtra; i++) {
@@ -239,6 +283,7 @@ function metricCheckEditorChange(changeObj) {
 
       if (ratioSkel > minSkel && ratioSkel < maxSkel){
         console.log("METRIC: Skel")
+        popup('You used your pasted code as skeleton code.', 1);
       }
     }, secondsForSkel *Math.pow(10,3))
   }
@@ -249,12 +294,14 @@ function metricCheckEditorChange(changeObj) {
     if (Math.abs(changeObj.to.line - metricsVars.errorLineNum) < numLinesForCloseness){
       console.log("METRIC editErrLineNum_edit");
       metricsVars.editErrLineNumMetric = false;
+      popup('You focused on the area of code that gave you the error.', 1);
+      strategiesCount.editErrLineNum += 1;
     }
     else {
         //if they edit somewhere else first, that doesn't count FOR editErrLineNumMetric
         metricsVars.editErrLineNumMetric = false;
         console.log("ANTI-metric Editing code directly after error not near error line (Avoidance)")
-
+        //popup('Make sure you understand why you are getting errors', -1); this is messing up assert statements
         //edit not near error, so can't count for break out of error cycle
         metricsVars.errorCycleCount = 0;
     }
@@ -275,6 +322,8 @@ function metricCheckCursorChange(cMirror) {
     if (Math.abs(myCodeMirror.getCursor().line - metricsVars.errorLineNum) < numLinesForCloseness){
       console.log("METRIC editErrLineNum_cursor");
       metricsVars.editErrLineNumMetric = false;
+      popup('You focused on the area of code that gave you the error.', 1);
+      strategiesCount.editErrLineNum += 1;
     }
   }
 }
@@ -287,21 +336,23 @@ function metricCheckCursorChange(cMirror) {
 */
 function metricCheckRunCode(prog){
   //get time between compilations
-  var d = new Date(); 
+  var d = new Date();
   d.getTime();
   // Time between current compile and previous compile
   var compileDelta = d - metricsVars.lastComiplationTime;
   metricsVars.lastComiplationTime = d;
 
-  //Check to see if user made any changes between compiles 
+  //Check to see if user made any changes between compiles
   // makes sure last compile was .5 second before to make sure it wasn't double click
   if (prog == metricsVars.lastCompiledCode && compileDelta > 500 ){
     console.log('ANTI-metric: No change between compiles');
     // if user fails to make changes, then they aren't being persisitant in error Cycle
+    popup('Make sure you think about your code before you run it.', -1);
     metricsVars.errorCycleCount = 0;
   }
   metricsVars.lastCompiledCode = prog;
   checkForPrint(prog, false);
+
 }
 
 /**
@@ -314,9 +365,12 @@ function metricCheckRunCodeSuccess(){
   //evaluate if broken error cycle
   if (metricsVars.errorCycleCount > numErrorsForCycle) {
     console.log("METRIC: breakOutOfErrCycle");
+
+    popup('You broke the error cycle.', 1);
+    strategiesCount.breakOutOfErrCycle += 1;
   }
   errCycleCount = 0;
-  metricsVars.lastCompileSuccessful = true; 
+  metricsVars.lastCompileSuccessful = true;
 }
 
 /**
@@ -337,6 +391,9 @@ function metricCheckRunCodeError(err){
     else {
       if (currentErrLineNum > metricsVars.errorLineNum && metricsVars.errorCycleCount > numErrorsForCycle) {
         console.log("METRIC: breakOutOfErrCycle");
+        
+        popup('You broke the error cycle.', 1);
+        strategiesCount.breakOutOfErrCycle += 1;
       }
       metricsVars.errorCycleCount = 0;
     }
@@ -345,9 +402,9 @@ function metricCheckRunCodeError(err){
   metricsVars.editErrLineNumMetric = true;
 
   // set timer to reset metric for err line number edit
-  lastSetTimeout = setTimeout(function(){ 
+  lastSetTimeout = setTimeout(function(){
     metricsVars.editErrLineNumMetric = false;
-  }, 30000) 
+  }, 30000)
   metricsVars.lastCompileSuccessful = false;
 }
 
@@ -372,6 +429,7 @@ function checkForPrint(prog, init) {
     if (index== -1){
       stillPrints = false;
     }
+
     else {
       // increment lastPrintCount
       lastPrintCount = index+1;
@@ -384,9 +442,11 @@ function checkForPrint(prog, init) {
           // metric only counts if the last compile had an error
           if (metricsVars.lastCompileSuccessful == false) {
             console.log("metric NEWPRINT")
+            popup('You debugged, which can help you understand the cause of your error.', 1);
+            strategiesCount.debugWithPrint += 1;
           }
         }
-      }   
+      }
     }
   }
   // copy the contents of this prints to the variable lastPrints to remember for next compile
@@ -427,7 +487,7 @@ function cleanArrayElements(codeArray){
 }
 
 /** countDupsFromMatrix
- * inputs: matrix - true represents when two entries are the same, minus the diagonal 
+ * inputs: matrix - true represents when two entries are the same, minus the diagonal
  * outputs: dupCount - count of duplicate sections of code
  * count number of duplicate sections of code
 **/
@@ -453,7 +513,7 @@ function countDupsFromMatrix(matrix, minLines){
 
 /** createMatrixfromArray
  * inputs: codeArray - array with each element is a line of cleaned code; duplicateMatrix - empty matrix of size codeArray.length^2
- * outputs: duplicateMatrix - matrix where true represents when two entries are the same, minus the diagonal 
+ * outputs: duplicateMatrix - matrix where true represents when two entries are the same, minus the diagonal
  * compares each element to all other elements of array and creates duplicateMatrix
 **/
 function createMatrixfromArray(codeArray, duplicateMatrix){
@@ -470,7 +530,7 @@ function createMatrixfromArray(codeArray, duplicateMatrix){
 }
 /** createMatrixfromTwoArrays
  * inputs: codeArray - array with each element is a line of cleaned code; duplicateMatrix - empty matrix of size codeArray.length x addedCode
- * outputs: duplicateMatrix - matrix where true represents when two entries are the same comparing codeArray and addedCode, minus the diagonal 
+ * outputs: duplicateMatrix - matrix where true represents when two entries are the same comparing codeArray and addedCode, minus the diagonal
  * compares each element to all other elements of array and creates duplicateMatrix
 **/
 function createMatrixfromTwoArrays(codeArray, addedCode, duplicateMatrix){
@@ -493,7 +553,7 @@ function createMatrixfromTwoArrays(codeArray, addedCode, duplicateMatrix){
 function detectCodeDuplication(prog){
   var codeArray = cleanWS(prog);
   // initialize matrix to record duplicates
-  var duplicateMatrix  = []; 
+  var duplicateMatrix  = [];
   for(var i=0; i<codeArray.length; i++) {
       duplicateMatrix[i] = new Array(codeArray.length);
   }
@@ -510,7 +570,7 @@ function checkNewDup(prog, addedCode){
   codeArray = cleanWS(prog);
   addedCodeCleaned = cleanArrayElements(addedCode);
 
-  var duplicateMatrix  = []; 
+  var duplicateMatrix  = [];
   for(var i=0; i<addedCodeCleaned.length; i++) {
       duplicateMatrix[i] = new Array(codeArray.length);
   }
