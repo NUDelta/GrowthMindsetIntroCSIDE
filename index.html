@@ -18,10 +18,23 @@
 
 	<div id="header">
     <div class="points">
-      <div class="menubar"></div>
-      <div class="menubar"></div>
-      <div class="menubar"></div>
+    	<span onclick="openNav()">
+    		<div class="menubar"></div>
+			<div class="menubar"></div>
+			<div class="menubar"></div>
+    	</span>
     </div>
+	<div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		<div id="sidenavHeader">
+			Discovered Strategies
+		</div>
+		<button class= "navElement" href="#">Go to error line when debugging</button>
+		<button class= "navElement" href="#">Break the error cycle</button>
+		<button class= "navElement" href="#">Understand pasted code</button>
+	</div>
+
+
     <div class="points" id="myPoints">Strategy Points: 0</div>
 		<select id="problemSelect" name="problemSelect">
 		  <option value="A">Green</option> <!-- dev easy -->
