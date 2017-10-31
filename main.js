@@ -579,24 +579,40 @@ function checkNewDup(prog, addedCode){
 }
 
 function openNav() {
+  var totalDiscoveredStrategies = 0;
   for(var key in strategiesCount) {
     if (document.getElementById(key) == null) {
       // create new div with id=key
-      let strategyName = document.createElement('div');
-      strategyName.innerHTML = strategiesCount[key][0];
-      // strategyName.id = key
-      strategyName.className = "navElement";
-      let mainContainer = document.getElementsByClassName("strategyWrapper")[0];
-      mainContainer.appendChild(strategyName);
-      let pointsRatio = document.createElement('div');
-      pointsRatio.innerHTML = strategiesCount[key][1];
-      pointsRatio.id = key;
-      pointsRatio.className = "strategyPoints";
-      mainContainer.appendChild(pointsRatio);
+      if (strategiesCount[key][1] > 0) {
+        let strategyName = document.createElement('div');
+        strategyName.innerHTML = strategiesCount[key][0];
+        // strategyName.id = key
+        strategyName.className = "navElement";
+        let mainContainer = document.getElementsByClassName("strategyWrapper")[0];
+        mainContainer.appendChild(strategyName);
+        let pointsRatio = document.createElement('div');
+        pointsRatio.innerHTML = strategiesCount[key][1];
+        pointsRatio.id = key;
+        pointsRatio.className = "strategyPoints";
+        mainContainer.appendChild(pointsRatio);
+
+        totalDiscoveredStrategies += 1;
+      }
     } else {
       // update points
       let pointsRatio = document.getElementById(key);
       pointsRatio.innerHTML = strategiesCount[key][1];
+    }
+  }
+  if (totalDiscoveredStrategies == 0) {
+    // display message encouraging users to discover new strategies
+    if (document.getElementById("tempMessage") == null) {
+      let tempMessage = document.createElement('div');
+      tempMessage.innerHTML = "Program with good strategies to discover which ones you use and repeat them to earn more points!";
+      tempMessage.className = "points";
+      tempMessage.id = "tempMessage";
+      let mainContainer = document.getElementsByClassName("strategyWrapper")[0];
+      mainContainer.appendChild(tempMessage);
     }
   }
   document.getElementById("mySidenav").style.width = "250px";
