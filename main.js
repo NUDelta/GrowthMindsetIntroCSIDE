@@ -27,14 +27,16 @@ var secondsForSkel = 240;
 // Keep track of the number of times each strategy is triggered
 var strategiesCount = {
   //Edit code near line error (do we want to subtract one if they don't do this?)
-  editErrLineNum: ["Go to error line when debugging",0],
+  editErrLineNum: ["Edited near error: understand error messages and look at the line causing the error.",0],
   //broke and error cycle
-  breakOutOfErrCycle : ["Break out of error cycle",0],
-  //copy and pasted code
-  copyPasted: ["Understand pasted code",0],
+  breakOutOfErrCycle : ["Persistence with errors: persist when code gives repeated errors.",0],
+  //copy pasted and then used code skeleton
+  usedSkeleton : ["Used code skeleton: reuse structures of existing code.",0],
+  //copy pasted and then refactored
+  refactored : ["Refactored code: refactor code when it isn’t working.",0],
   //negative 1 if run code without making any changes
   //plus 1 with print statements
-  debugWithPrint: ["Debug with print statements",0],
+  debugWithPrint: ["Print statement debugging: use print statements to help uncover the cause of an error.",0],
 }
 
 // When the user clicks on <div>, open the popup
@@ -248,8 +250,6 @@ function metricCheckEditorChange(changeObj) {
   newCharCount = myCodeMirror.getValue().length;
   if (newCharCount-metricsVars.charCount > 2 && metricsVars.lastKeyPressed !='enter'){
     console.log("METRIC: Paste");
-    popup('Do you understand what the code you just pasted does?', 1);
-    strategiesCount.copyPasted[1] += 1;
     //check to see if it was pasted from content inside code
     var prog = myCodeMirror.getValue();
     var dupPaste = checkNewDup(prog, changeObj.text);
@@ -262,7 +262,8 @@ function metricCheckEditorChange(changeObj) {
         if (dupPaste - dupAfterTime >= 2 && dupAfterTime >=1){
           console.log("METRIC: refactor")
           clearInterval(pasteInterval);
-          popup('You refactored your code.', 1);
+          popup('Refactored code', 1);
+          strategiesCount.refactored[1] += 1;
         }
         timesRun += 1;
         if(timesRun === 60){
@@ -287,7 +288,8 @@ function metricCheckEditorChange(changeObj) {
 
       if (ratioSkel > minSkel && ratioSkel < maxSkel){
         console.log("METRIC: Skel")
-        popup('You used your pasted code as skeleton code.', 1);
+        strategiesCount.usedSkeleton[1] += 1;
+        popup('Used code skeleton', 1);
       }
     }, secondsForSkel *Math.pow(10,3))
   }
@@ -298,7 +300,7 @@ function metricCheckEditorChange(changeObj) {
     if (Math.abs(changeObj.to.line - metricsVars.errorLineNum) < numLinesForCloseness){
       console.log("METRIC editErrLineNum_edit");
       metricsVars.editErrLineNumMetric = false;
-      popup('You focused on the area of code that gave you the error.', 1);
+      popup('Edited near error', 1);
       strategiesCount.editErrLineNum[1] += 1;
     }
     else {
@@ -326,7 +328,7 @@ function metricCheckCursorChange(cMirror) {
     if (Math.abs(myCodeMirror.getCursor().line - metricsVars.errorLineNum) < numLinesForCloseness){
       console.log("METRIC editErrLineNum_cursor");
       metricsVars.editErrLineNumMetric = false;
-      popup('You focused on the area of code that gave you the error.', 1);
+      popup('Edited near error', 1);
       strategiesCount.editErrLineNum[1] += 1;
     }
   }
@@ -351,7 +353,7 @@ function metricCheckRunCode(prog){
   if (prog == metricsVars.lastCompiledCode && compileDelta > 500 ){
     console.log('ANTI-metric: No change between compiles');
     // if user fails to make changes, then they aren't being persisitant in error Cycle
-    popup('Make sure you think about your code before you run it.', -1);
+    popup('Think about the error you got before running code again.', -1);
     metricsVars.errorCycleCount = 0;
   }
   metricsVars.lastCompiledCode = prog;
@@ -369,8 +371,7 @@ function metricCheckRunCodeSuccess(){
   //evaluate if broken error cycle
   if (metricsVars.errorCycleCount > numErrorsForCycle) {
     console.log("METRIC: breakOutOfErrCycle");
-
-    popup('You broke the error cycle.', 1);
+    popup('Persistence with errors', 1);
     strategiesCount.breakOutOfErrCycle[1] += 1;
   }
   errCycleCount = 0;
@@ -395,8 +396,7 @@ function metricCheckRunCodeError(err){
     else {
       if (currentErrLineNum > metricsVars.errorLineNum && metricsVars.errorCycleCount > numErrorsForCycle) {
         console.log("METRIC: breakOutOfErrCycle");
-
-        popup('You broke the error cycle.', 1);
+        popup('Persistence with errors', 1);
         strategiesCount.breakOutOfErrCycle[1] += 1;
       }
       metricsVars.errorCycleCount = 0;
@@ -446,7 +446,7 @@ function checkForPrint(prog, init) {
           // metric only counts if the last compile had an error
           if (metricsVars.lastCompileSuccessful == false) {
             console.log("metric NEWPRINT")
-            popup('You debugged, which can help you understand the cause of your error.', 1);
+            popup('Print statement debugging', 1);
             strategiesCount.debugWithPrint[1] += 1;
           }
         }
