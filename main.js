@@ -27,14 +27,14 @@ var secondsForSkel = 240;
 // Keep track of the number of times each strategy is triggered
 var strategiesCount = {
   //Edit code near line error (do we want to subtract one if they don't do this?)
-  editErrLineNum: 0,
+  editErrLineNum: ["Go to error line when debugging",0],
   //broke and error cycle
-  breakOutOfErrCycle : 0,
+  breakOutOfErrCycle : ["Break out of error cycle",0],
   //copy and pasted code
-  copyPasted: 0,
+  copyPasted: ["Understand pasted code",0],
   //negative 1 if run code without making any changes
   //plus 1 with print statements
-  debugWithPrint: 0,
+  debugWithPrint: ["Debug with print statements",0],
 }
 
 // When the user clicks on <div>, open the popup
@@ -245,7 +245,7 @@ function metricCheckEditorChange(changeObj) {
   if (newCharCount-metricsVars.charCount > 2 && metricsVars.lastKeyPressed !='enter'){
     console.log("METRIC: Paste");
     popup('Do you understand what the code you just pasted does?', 1);
-    strategiesCount.copyPasted += 1;
+    strategiesCount.copyPasted[1] += 1;
     //check to see if it was pasted from content inside code
     var prog = myCodeMirror.getValue();
     var dupPaste = checkNewDup(prog, changeObj.text);
@@ -295,7 +295,7 @@ function metricCheckEditorChange(changeObj) {
       console.log("METRIC editErrLineNum_edit");
       metricsVars.editErrLineNumMetric = false;
       popup('You focused on the area of code that gave you the error.', 1);
-      strategiesCount.editErrLineNum += 1;
+      strategiesCount.editErrLineNum[1] += 1;
     }
     else {
         //if they edit somewhere else first, that doesn't count FOR editErrLineNumMetric
@@ -323,7 +323,7 @@ function metricCheckCursorChange(cMirror) {
       console.log("METRIC editErrLineNum_cursor");
       metricsVars.editErrLineNumMetric = false;
       popup('You focused on the area of code that gave you the error.', 1);
-      strategiesCount.editErrLineNum += 1;
+      strategiesCount.editErrLineNum[1] += 1;
     }
   }
 }
@@ -367,7 +367,7 @@ function metricCheckRunCodeSuccess(){
     console.log("METRIC: breakOutOfErrCycle");
 
     popup('You broke the error cycle.', 1);
-    strategiesCount.breakOutOfErrCycle += 1;
+    strategiesCount.breakOutOfErrCycle[1] += 1;
   }
   errCycleCount = 0;
   metricsVars.lastCompileSuccessful = true;
@@ -393,7 +393,7 @@ function metricCheckRunCodeError(err){
         console.log("METRIC: breakOutOfErrCycle");
         
         popup('You broke the error cycle.', 1);
-        strategiesCount.breakOutOfErrCycle += 1;
+        strategiesCount.breakOutOfErrCycle[1] += 1;
       }
       metricsVars.errorCycleCount = 0;
     }
@@ -443,7 +443,7 @@ function checkForPrint(prog, init) {
           if (metricsVars.lastCompileSuccessful == false) {
             console.log("metric NEWPRINT")
             popup('You debugged, which can help you understand the cause of your error.', 1);
-            strategiesCount.debugWithPrint += 1;
+            strategiesCount.debugWithPrint[1] += 1;
           }
         }
       }
@@ -579,9 +579,45 @@ function checkNewDup(prog, addedCode){
 }
 
 function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
+  var totalDiscoveredStrategies = 0;
+  for(var key in strategiesCount) {
+    if (document.getElementById(key) == null) {
+      // create new div with id=key
+      if (strategiesCount[key][1] > 0) {
+        let strategyName = document.createElement('div');
+        strategyName.innerHTML = strategiesCount[key][0];
+        // strategyName.id = key
+        strategyName.className = "navElement";
+        let mainContainer = document.getElementsByClassName("strategyWrapper")[0];
+        mainContainer.appendChild(strategyName);
+        let pointsRatio = document.createElement('div');
+        pointsRatio.innerHTML = strategiesCount[key][1];
+        pointsRatio.id = key;
+        pointsRatio.className = "strategyPoints";
+        mainContainer.appendChild(pointsRatio);
+
+        totalDiscoveredStrategies += 1;
+      }
+    } else {
+      // update points
+      let pointsRatio = document.getElementById(key);
+      pointsRatio.innerHTML = strategiesCount[key][1];
+    }
+  }
+  if (totalDiscoveredStrategies == 0) {
+    // display message encouraging users to discover new strategies
+    if (document.getElementById("tempMessage") == null) {
+      let tempMessage = document.createElement('div');
+      tempMessage.innerHTML = "Program with good strategies to discover which ones you use and repeat them to earn more points!";
+      tempMessage.className = "points";
+      tempMessage.id = "tempMessage";
+      let mainContainer = document.getElementsByClassName("strategyWrapper")[0];
+      mainContainer.appendChild(tempMessage);
+    }
+  }
+  document.getElementById("mySidenav").style.width = "250px";
 }
 
 function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
+  document.getElementById("mySidenav").style.width = "0";
 }
