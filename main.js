@@ -60,6 +60,10 @@ function points(value) {
     var totalPoints = myPoints.innerHTML.split(": ")[1];
     myPoints.innerHTML = parseInt(totalPoints) + value;
     myPoints.innerHTML = "Total Points: " + myPoints.innerHTML;
+    var hamburger = document.getElementsByClassName('menubar');
+    for(i = 0; i < hamburger.length; i++) {
+      hamburger[i].style.backgroundColor = 'cyan';
+    }
 }
 
 $(document).ready(function(e) {
@@ -391,7 +395,7 @@ function metricCheckRunCodeError(err){
     else {
       if (currentErrLineNum > metricsVars.errorLineNum && metricsVars.errorCycleCount > numErrorsForCycle) {
         console.log("METRIC: breakOutOfErrCycle");
-        
+
         popup('You broke the error cycle.', 1);
         strategiesCount.breakOutOfErrCycle[1] += 1;
       }
@@ -614,6 +618,10 @@ function openNav() {
       let mainContainer = document.getElementsByClassName("strategyWrapper")[0];
       mainContainer.appendChild(tempMessage);
     }
+  }
+  var hamburger = document.getElementsByClassName('menubar');
+  for(i = 0; i < hamburger.length; i++) {
+    hamburger[i].style.backgroundColor = 'grey';
   }
   document.getElementById("mySidenav").style.width = "250px";
 }
