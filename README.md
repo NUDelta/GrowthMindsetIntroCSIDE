@@ -1,10 +1,4 @@
 # README
 
-Testing VSCode for ability to collect process data
+Creating Web Code editor for testing
 
-## Features
-
-Capture Keystrokes
-Capture Selection
-Capture Clicks
-Send messages to user
