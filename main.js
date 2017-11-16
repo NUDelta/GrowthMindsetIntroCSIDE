@@ -124,7 +124,17 @@ $(document).ready(function(e) {
   });
 });
 
-/**
+ $(document).ready(function () {
+    $(document).keydown( function (e) {
+        if (e.keyCode == 112){
+          popup("good job f1", 1);
+        }
+        else if (e.keyCode == 113)
+        {
+          popup("good job f2", 1);
+        }
+    });
+ });/**
  * function selectProblem
  * inputs: letter - String of capitol letter determined by which dropdown is selected
  * outpus: none
