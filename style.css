@@ -112,11 +112,24 @@ body{
 }
 
 /* Toggle this class when clicking on the popup container (hide and show the popup) */
-.popup .show {
-    visibility: visible;
-    /*-webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;*/
+/*Animate the popup so it snaps down*/
+.popup .show{
+  visibility: visible;
+  -webkit-animation:moveOpen 4s;
+  -webkit-animation-fill-mode: forwards;
 }
+
+/* Safari and Chrome */
+@-webkit-keyframes moveOpen {
+  from {-webkit-transform: translate(0,-100px);}
+  10% {-webkit-transform: translate(0,5px);}
+  12% {-webkit-transform: translate(0,7px);}
+  16% {-webkit-transform: translate(0,5px);}
+  80% {-webkit-transform: translate(0,5px);}
+  85% {-webkit-transform: translate(0,10px);}
+  to {-webkit-transform: translate(0,-100px);}
+}
+
 .CodeMirror{
     height: 400px;
     padding-top: 10px;

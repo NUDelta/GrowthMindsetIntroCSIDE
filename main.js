@@ -241,13 +241,39 @@ function getErrLineNum(err) {
 */
 function metricCheckEditorChange(changeObj) {
   // keeping track of the last key that was pressed
+  console.log("------------------------");
+$("#ENQUIRY_VIEWMETER").keydown(function(event) {
+  console.log("------------------------");
+    if(event.which == 113) { //F2
+        updateMtr();
+        console.log("------------------------");
+        return false;
+    }
+    else if(event.which == 114) { //F3
+        resetView();
+        console.log("------------------------");
+        return false;
+    }
+});
+
+//   shortcut.add("F1", function() {
+//     console.log("------------------------");
+//     alert("F1 pressed");
+
+// });
   metricsVars.lastKeyPressed = changeObj.text[0];
+  if(changeObj.text[0] == "064")
+    {console.log("------------------------");
+    console.log(changeObj);
+  }
   if (changeObj.text.length == 2 && !changeObj.text[0] && !changeObj.text[1] ){
     metricsVars.lastKeyPressed = 'enter';
   }
   if (changeObj.from.line == changeObj.to.line && changeObj.from.ch == changeObj.to.ch){
     // added one character
   }
+
+  // if(metricsVars.lastKeyPressed == )
   //character count of editor
   newCharCount = myCodeMirror.getValue().length;
   if (newCharCount-metricsVars.charCount > 2 && metricsVars.lastKeyPressed !='enter'){
