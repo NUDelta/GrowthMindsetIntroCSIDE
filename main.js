@@ -250,7 +250,6 @@ function getErrLineNum(err) {
  * checks all metrics related to editor changes
 */
 function metricCheckEditorChange(changeObj) {
-  // keeping track of the last key that was pressed
   metricsVars.lastKeyPressed = changeObj.text[0];
   if (changeObj.text.length == 2 && !changeObj.text[0] && !changeObj.text[1] ){
     metricsVars.lastKeyPressed = 'enter';
