@@ -107,7 +107,21 @@ $(document).ready(function(e) {
       // Start the prompt with history enabled.
       jqconsole.Prompt(true, function (input) {
         // Output input with the class jqconsole-output.
-        jqconsole.Write(input + '\n', 'jqconsole-output');
+        //run python code using skuplt
+        Sk.pre = "output";
+        Sk.configure({output:consoleOutputResult, read:builtinRead});
+        var myPromise = Sk.misceval.asyncToPromise(function() {
+           return Sk.importMainWithBody("<stdin>", false, input, true);
+        });
+        // success function on promise return
+        myPromise.then(function(mod) {
+          console.log('success');
+        },
+        // error function on promise return
+        function(err) {
+          consoleOutputResult(err.toString());
+          console.log(err);
+        });
         // Restart the prompt.
         startPrompt();
       });

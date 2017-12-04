@@ -1,10 +1,14 @@
 # README
 
-Testing VSCode for ability to collect process data
+Web-based text editor using CodeMirror, jqconsole, and Skulpt.
 
-## Features
+Download or clone repo and switch branch to ```bp3```:
+	
+	git clone https://github.com/NUDelta/GrowthMindsetIntroCSIDE/
+	git checkout bp3
 
-Capture Keystrokes
-Capture Selection
-Capture Clicks
-Send messages to user
+Install dependencies:
+	
+	npm install
+	
+Open ```index.html``` in a web browser, and you're running!
