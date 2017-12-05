@@ -104,6 +104,7 @@ $(document).ready(function(e) {
 });
 
  $(document).ready(function () {
+    // Here are the popups for the Wizard of Oz study
     $(document).keydown( function (e) {
         if (e.keyCode == 112){
           popup("Try using comments to write out what your function should do in each step");
