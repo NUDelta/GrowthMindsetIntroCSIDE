@@ -106,13 +106,16 @@ $(document).ready(function(e) {
  $(document).ready(function () {
     // Here are the popups for the Wizard of Oz study
     $(document).keydown( function (e) {
+        //fn+F1 triggers this popup
         if (e.keyCode == 112){
           popup("Try using comments to write out what your function should do in each step");
         }
+        //fn+F2 triggers this popup
         else if (e.keyCode == 113)
         {
           popup("Try googling what you’re stuck on, many problems you run into other people have too");
         }
+        //fn+F3 triggers this popup
         else if (e.keyCode == 114)
         {
           popup("Try running through your function with an example input");
