@@ -37,17 +37,6 @@ body{
     margin-left: 2px;
 }
 
-/* Display the points */
-.points {
-    top: 0px;
-    padding:5px;
-    display: inline-block;
-    cursor: pointer;
-    color: grey;
-    float: right;
-    padding-left: 20px;
-}
-
 .menubar{
     width: 20px;
     height: 3px;
@@ -55,15 +44,6 @@ body{
     margin: 3px 0;
 }
 
-.strategyPoints{
-    color: white;
-    padding-top: 20px;
-    width: 40px;
-    margin-right: 0px;
-    float: right;
-    line-height: 40px;
-    padding-right: 5px;
-}
 .strategyWrapper{
     width: 100%;
     float: right;

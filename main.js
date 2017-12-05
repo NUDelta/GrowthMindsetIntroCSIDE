@@ -40,34 +40,13 @@ var strategiesCount = {
 }
 
 // When the user clicks on <div>, open the popup
-function popup(message, value) {
+function popup(message) {
     var popup = document.getElementById("myPopup");
     var popupText = document.getElementById("message");
     var pointMessage = document.getElementById("pointMessage");
     popupText.innerHTML = message;
-    if (value > 0) {
-      pointMessage.innerHTML = '+' + value.toString() + ' point';
-    }
-    else {
-      pointMessage.innerHTML = value.toString() + ' point';
-    }
     popup.classList.toggle("show");
-    points(value);
     setTimeout(function(){ popup.className = popup.className.replace("show", ""); }, 5000);
-}
-
-// When the user gets a popup, increase points by value
-function points(value) {
-    var myPoints = document.getElementById("myPoints");
-    var totalPoints = parseInt(myPoints.innerHTML.split(": ")[1]) + value;
-    if(totalPoints < 0)
-      totalPoints = 0;
-    myPoints.innerHTML = totalPoints;
-    myPoints.innerHTML = "Total Points: " + myPoints.innerHTML;
-    var hamburger = document.getElementsByClassName('menubar');
-    for(i = 0; i < hamburger.length; i++) {
-      hamburger[i].style.backgroundColor = 'cyan';
-    }
 }
 
 $(document).ready(function(e) {
@@ -127,14 +106,20 @@ $(document).ready(function(e) {
  $(document).ready(function () {
     $(document).keydown( function (e) {
         if (e.keyCode == 112){
-          popup("good job f1", 1);
+          popup("Try using comments to write out what your function should do in each step");
         }
         else if (e.keyCode == 113)
         {
-          popup("good job f2", 1);
+          popup("Try googling what you’re stuck on, many problems you run into other people have too");
+        }
+        else if (e.keyCode == 114)
+        {
+          popup("Try running through your function with an example input");
         }
     });
- });/**
+ });
+
+ /**
  * function selectProblem
  * inputs: letter - String of capitol letter determined by which dropdown is selected
  * outpus: none
@@ -273,7 +258,7 @@ function metricCheckEditorChange(changeObj) {
         if (dupPaste - dupAfterTime >= 2 && dupAfterTime >=1){
           console.log("METRIC: refactor")
           clearInterval(pasteInterval);
-          popup('Refactored code', 1);
+          // popup('Refactored code', 1);
           strategiesCount.refactored[1] += 1;
         }
         timesRun += 1;
@@ -300,7 +285,7 @@ function metricCheckEditorChange(changeObj) {
       if (ratioSkel > minSkel && ratioSkel < maxSkel){
         console.log("METRIC: Skel")
         strategiesCount.usedSkeleton[1] += 1;
-        popup('Used code skeleton', 1);
+        // popup('Used code skeleton', 1);
       }
     }, secondsForSkel *Math.pow(10,3))
   }
@@ -311,7 +296,7 @@ function metricCheckEditorChange(changeObj) {
     if (Math.abs(changeObj.to.line - metricsVars.errorLineNum) < numLinesForCloseness){
       console.log("METRIC editErrLineNum_edit");
       metricsVars.editErrLineNumMetric = false;
-      popup('Edited near error', 1);
+      // popup('Edited near error', 1);
       strategiesCount.editErrLineNum[1] += 1;
     }
     else {
@@ -339,7 +324,7 @@ function metricCheckCursorChange(cMirror) {
     if (Math.abs(myCodeMirror.getCursor().line - metricsVars.errorLineNum) < numLinesForCloseness){
       console.log("METRIC editErrLineNum_cursor");
       metricsVars.editErrLineNumMetric = false;
-      popup('Edited near error', 1);
+      // popup('Edited near error', 1);
       strategiesCount.editErrLineNum[1] += 1;
     }
   }
@@ -364,7 +349,7 @@ function metricCheckRunCode(prog){
   if (prog == metricsVars.lastCompiledCode && compileDelta > 500 ){
     console.log('ANTI-metric: No change between compiles');
     // if user fails to make changes, then they aren't being persisitant in error Cycle
-    popup('Think about the error you got before running code again.', -1);
+    // popup('Think about the error you got before running code again.', -1);
     metricsVars.errorCycleCount = 0;
   }
   metricsVars.lastCompiledCode = prog;
@@ -382,7 +367,7 @@ function metricCheckRunCodeSuccess(){
   //evaluate if broken error cycle
   if (metricsVars.errorCycleCount > numErrorsForCycle) {
     console.log("METRIC: breakOutOfErrCycle");
-    popup('Persistence with errors', 1);
+    // popup('Persistence with errors', 1);
     strategiesCount.breakOutOfErrCycle[1] += 1;
   }
   errCycleCount = 0;
@@ -407,7 +392,7 @@ function metricCheckRunCodeError(err){
     else {
       if (currentErrLineNum > metricsVars.errorLineNum && metricsVars.errorCycleCount > numErrorsForCycle) {
         console.log("METRIC: breakOutOfErrCycle");
-        popup('Persistence with errors', 1);
+        // popup('Persistence with errors', 1);
         strategiesCount.breakOutOfErrCycle[1] += 1;
       }
       metricsVars.errorCycleCount = 0;
@@ -457,7 +442,7 @@ function checkForPrint(prog, init) {
           // metric only counts if the last compile had an error
           if (metricsVars.lastCompileSuccessful == false) {
             console.log("metric NEWPRINT")
-            popup('Print statement debugging', 1);
+            // popup('Print statement debugging', 1);
             strategiesCount.debugWithPrint[1] += 1;
           }
         }
